@@ -1,0 +1,80 @@
+var upcoordX = [];
+var downcoordX = [];
+var upcoordY = [];
+var downcoordY = [];
+
+var x1 = 0;
+
+var upX;
+var downX;
+var upY;
+var downY;
+
+var frameWait = 120;
+
+var rows;
+
+function preload(){
+  table = loadTable('../assets/River_Lines.csv', 'csv', 'header');
+}
+
+function setup() {
+  createCanvas(windowWidth, windowHeight);
+  background(255);
+
+  print(console.log(table.getRowCount()+ 'rows in the table.'));
+  print(console.log(table.getColumnCount()+ 'columns in the table.'));
+
+  rows = table.getRows();
+  new newOsc();
+}
+
+function draw() {
+  if(frameCount%frameWait === 0){
+    if(x1 < 500){
+      upcoordX.push(rows[x1].get('upcoordX'));
+      downcoordX.push(rows[x1].get('downcoordX'));
+      var upX = map(upcoordX[x1], 1551000, 1652000, 0, windowWidth);
+      var downX = map(downcoordX[x1], 1551000, 1652000, 0, windowWidth);
+      upcoordY.push(rows[x1].get('upcoordY'));
+      var upY = map(upcoordY[x1], 6180000, 6200000, 0, windowHeight);
+      downcoordY.push(rows[x1].get('downcoordY'));
+      var downY = map(downcoordY[x1], 6180000, 6200000, 0, windowHeight);
+      upX = int(upX);
+      upY = int(upY);
+      downX = int(downX);
+      downY = int(downY);
+      console.log(upX);
+      console.log(downX);
+      console.log(upY);
+      console.log(downY);
+      console.log(x1 + 'current spot');
+      color(0,0,255);
+      stroke(1);
+      strokeWeight(3);
+      line(upX, upY, downX, downY);
+      if(x1%20 === 0){
+        new newOsc();
+      }
+      }
+    x1++
+  }
+}
+
+
+function newOsc(){
+  envelope = new p5.Env();
+  osc = new p5.Oscillator();
+  osc.setType('square');
+  osc.freq(random(50,150));
+  osc.amp(0.005);
+  osc.amp(envelope);
+  envelope.setADSR(120, 60, 1.0, 0);
+  osc.start();
+  modOsc = new p5.Oscillator();
+  modOsc.setType('sine');
+  modOsc.freq(5);
+  modOsc.amp(0);
+  modOsc.start();
+  osc.amp(modOsc);
+}
